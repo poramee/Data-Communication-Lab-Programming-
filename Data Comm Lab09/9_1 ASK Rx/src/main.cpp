@@ -21,8 +21,8 @@ int delay0;
 
 #define r_slope 80
 int sum = 0;
-int m = 0;
 int prev = 0;
+int m = 0;
 int check = false;
 int output = -1;
 int count = 0;
@@ -30,11 +30,15 @@ int count = 0;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  // dac.begin(0x64);
-  dac.begin(0x62);
+  dac.begin(0x64);
+  // dac.begin(0x62);
   delay0 = (1000000 / freq0 - 1000000 / defaultFreq) / 4;
   Serial.flush();
 }
+
+int bits[8];
+int it = 0;
+int prevBits[2];
 
 void loop() {
   // put your main code here, to run repeatedly:
@@ -48,23 +52,41 @@ void loop() {
   }
   if (m - tmp > r_slope) {
     if (check == true) {
-      //      if(m > 10)Serial.println(m);
       if (a0min < m && m < a0max) {
         Serial.print("0 0 ");
+        prevBits[0] = 0;
+        prevBits[1] = 0;
         count++;
       } else if (a1min < m && m < a1max) {
         Serial.print("0 1 ");
+        prevBits[0] = 0;
+        prevBits[1] = 1;
         count++;
       } else if (a2min < m && m < a2max) {
         Serial.print("1 0 ");
+        prevBits[0] = 1;
+        prevBits[1] = 0;
         count++;
       } else if (a3min < m && m < a3max) {
         Serial.print("1 1 ");
+        prevBits[0] = 1;
+        prevBits[1] = 1;
         count++;
       }
       if (count == 5) {
-        Serial.println();
+        bits[7 - it] = prevBits[1];
+        bits[7 - 1 - it] = prevBits[0];
+        it += 2;
         count = 0;
+        Serial.println();
+      }
+      if(it >= 8){
+        int cc = 0;
+        for(int i = 0;i < 8;++i){
+          cc += bits[i] * (1 << (8 - i - 1));
+        }
+        Serial.println((char)cc);
+        it = 0;
       }
     }
     check = false;
