@@ -14,6 +14,7 @@ char inData[20];
 void setup() {
   Serial.begin(115200);
   dac.begin(0x64);
+  Serial.println("9_1 ASK TX");
   delay0 = (1000000/freq0 - 1000000/defaultFreq)/4;
   for(int i = 0;i < 4;++i){
     S_DAC[i] = (sin(zeta[i] * (PI / 180)) + 1) * (500);
@@ -27,7 +28,7 @@ void loop() {
     Serial.println("-------");
     for (int i = 0; i < 20;i++) {
       inData[i] = Serial.read(); // Read a character
-      // Serial.println(int(inData[i]));
+      Serial.println(int(inData[i]));
     }
     /*use a cycle loop i for send data 8 bits*/
     for (int i = 0; inData[i] != -1; i++) {
@@ -50,9 +51,9 @@ void loop() {
             delayMicroseconds(delay0); // sampling delay
           }
         }
-        Serial.print((tmp >> 1 )&1);
-        Serial.print(" ");
-        Serial.println((tmp)&1);
+        // Serial.print((tmp >> 1 )&1);
+        // Serial.print(" ");
+        // Serial.println((tmp)&1);
         inData[i] >>= 2;
       }
     }
