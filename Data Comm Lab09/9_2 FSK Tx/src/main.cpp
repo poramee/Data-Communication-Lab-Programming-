@@ -17,13 +17,13 @@ Adafruit_MCP4725 dac;
 void setup() {
     Serial.begin(9600);
     dac.begin(0x64);
-    Delay[0] = ((1/(double)f0) / (double)4)*1000000;
-    Delay[1] = ((1 / (double)f1) / (double)4)*1000000;
-    Delay[2] = ((1 / (double)f2) / (double)4)*1000000;
-    Delay[3] = ((1 / (double)f3) / (double)4)*1000000;
+    Delay[0] = (1000000 / f0 - 1000000 / defaultFreq) / 4;
+    Delay[1] = (1000000 / f1 - 1000000 / defaultFreq) / 4;
+    Delay[2] = (1000000 / f2 - 1000000 / defaultFreq) / 4;
+    Delay[3] = (1000000 / f3 - 1000000 / defaultFreq) / 4;
     for (int i = 0; i < 4; ++i) {
       S_DAC[i] = (sin(zeta[i] * (PI / 180)) + 1) * (500);
-      Serial.println(Delay[i]);
+      Serial.println(S_DAC[i] * 3);
     }
 
     Serial.flush();
@@ -43,8 +43,8 @@ void loop() {
         Serial.println("|||||||");
         for(int k = 3;k >= 0;k--){
             for(int cycle = 0;cycle < cycleN;++cycle){
-                for(int phase = 0;phase < 4;++phase){
-                    dac.setVoltage(S_DAC[phase],false);
+                for(int sample = 0;sample < 4;++sample){
+                    dac.setVoltage(S_DAC[sample] * 3,false);
                     // Serial.println(S_DAC[3 - k]);
                     delayMicroseconds(Delay[input[k]]);
                 }
